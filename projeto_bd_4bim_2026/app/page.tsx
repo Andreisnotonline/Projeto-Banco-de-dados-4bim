@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-// O restante do seu código continua aqui embaixo..
+// O restante do seu código continua aqui embaix
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
