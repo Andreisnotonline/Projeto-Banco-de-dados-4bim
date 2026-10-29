@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CharFeed - Comunidade de Personagens</title>
+    <style>
+        :root {
+            --bg-color: #0f1117;
+            --surface-color: #1a1d24;
+            --surface-hover: #222630;
+            --border-color: #2a2e39;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+            --danger-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-bottom: 4rem;
+        }
+
+        header {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rsem;
+        }
+
+        .logo span {
+            color: var(--accent-color);
+        }
+
+        main {
+            max-width: 680px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Caixa de Criação de Post */
+        .create-post-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .create-post-card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-color);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            justify-content: center;
+            transition: border-color 0.2s;
+        }
+
+        .file-input-wrapper:hover {
+            border-color: var(--accent-color);
+        }
+
+        .file-input-wrapper input {
+            display: none;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Feed de Posts */
+        .post-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .post-meta {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .post-author {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .post-character-badge {
+            background-color: rgba(99, 102, 241, 0.15);
+            color: var(--accent-color);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            width: fit-content;
+            margin-top: 2px;
+        }
+
+        .post-title {
+            padding: 1rem 1.25rem 0.5rem 1.25rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+        }
+
+        .post-image-container {
+            width: 100%;
+            max-height: 500px;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .post-image-container img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+        }
+
+        /* Ações do Post (Likes, Comentários) */
+        .post-actions {
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            gap: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .action-btn:hover, .action-btn.active {
+            color: var(--accent-color);
+        }
+
+        /* Seção de Comentários */
+        .comments-section {
+            padding: 1rem 1.25rem;
+            background-color: rgba(0,0,0,0.2);
+            border-top: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .comments-section.open {
+            display: block;
+        }
+
+        .comment-item {
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 0.1rem;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .comment-form input {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            border-radius: 6px;
+        }
+
+        .comment-form button {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        .empty-feed {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 3rem 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">💬 Char<span>Feed</span></div>
+    </header>
+
+    <main>
+        <!-- Caixa para Criar Post -->
+        <div class="create-post-card">
+            <h2>Criar Nova Conversa de Personagem</h2>
+            <form id="postForm">
+                <div class="form-group">
+                    <input type="text" id="authorName" class="form-control" placeholder="Seu nome ou @usuário" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="charName" class="form-control" placeholder="Nome do Personagem (Ex: Batman, Jinx, Goku...)" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="postTitle" class="form-control" placeholder="Título da discussão sobre a imagem" required>
+                </div>
+                <div class="form-group">
+                    <label class="file-input-wrapper" id="dropZone">
+                        <span>📷 Clique para enviar a imagem do personagem (Obrigatório)</span>
+                        <input type="file" id="postImage" accept="image/*" required>
+                    </label>
+                </div>
+                <button type="submit" class="btn">Publicar Post</button>
+            </form>
+        </div>
+
+        <!-- Feed -->
+        <div id="feedContainer">
+            <!-- Os posts aparecerão aqui dinamicamente -->
+        </div>
+    </main>
+
+    <script>
+        // Recuperar posts do localStorage ou iniciar vazio
+        let posts = JSON.parse(localStorage.getItem('charfeed_posts')) || [];
+
+        const postForm = document.getElementById('postForm');
+        const feedContainer = document.getElementById('feedContainer');
+        const fileInput = document.getElementById('postImage');
+        const fileWrapper = document.getElementById('dropZone');
+
+        // Atualizar texto do input de arquivo ao selecionar imagem
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileWrapper.querySelector('span').textContent = `✅ Imagem selecionada: ${e.target.files[0].name}`;
+                fileWrapper.style.borderColor = 'var(--accent-color)';
+            }
+        });
+
+        // Enviar novo post
+        postForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const author = document.getElementById('authorName').value;
+            const character = document.getElementById('charName').value;
+            const title = document.getElementById('postTitle').value;
+            const imageFile = fileInput.files[0];
+
+            if (!imageFile) {
+                alert('É obrigatório enviar uma imagem do personagem!');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const newPost = {
+                    id: Date.now(),
+                    author,
+                    character,
+                    title,
+                    image: event.target.result,
+                    likes: 0,
+                    liked: false,
+                    comments: []
+                };
+
+                posts.unshift(newPost);
+                saveAndRender();
+                postForm.reset();
+                fileWrapper.querySelector('span').textContent = '📷 Clique para enviar a imagem do personagem (Obrigatório)';
+                fileWrapper.style.borderColor = 'var(--border-color)';
+            };
+
+            reader.readAsDataURL(imageFile);
+        });
+
+        // Curtir Post
+        function toggleLike(id) {
+            const post = posts.find(p => p.id === id);
+            if (post) {
+                if (post.liked) {
+                    post.likes--;
+                    post.liked = false;
+                } else {
+                    post.likes++;
+                    post.liked = true;
+                }
+                saveAndRender();
+            }
+        }
+
+        // Alternar visualização de comentários
+        function toggleComments(id) {
+            const section = document.getElementById(`comments-${id}`);
+            section.classList.toggle('open');
+        }
+
+        // Adicionar comentário
+        function addComment(event, id) {
+            event.preventDefault();
+            const input = document.getElementById(`comment-input-${id}`);
+            const commentText = input.value.trim();
+
+            if (!commentText) return;
+
+            const post = posts.find(p => p.id === id);
+            if (post) {
+                post.comments.push({
+                    author: "Usuário",
+                    text: commentText
+                });
+                saveAndRender();
+                // Manter seção aberta após comentar
+                setTimeout(() => {
+                    document.getElementById(`comments-${id}`).classList.add('open');
+                }, 50);
+            }
+        }
+
+        // Salvar no LocalStorage e renderizar o feed
+        function saveAndRender() {
+            localStorage.setItem('charfeed_posts', JSON.stringify(posts));
+            renderFeed();
+        }
+
+        // Renderizar Feed na tela
+        function renderFeed() {
+            if (posts.length === 0) {
+                feedContainer.innerHTML = `<div class="empty-feed">Nenhuma conversa iniciada ainda. Seja o primeiro a postar!</div>`;
+                return;
+            }
+
+            feedContainer.innerHTML = posts.map(post => `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-meta">
+                            <span class="post-author">@${escapeHtml(post.author)}</span>
+                            <span class="post-character-badge">👤 ${escapeHtml(post.character)}</span>
+                        </div>
+                    </div>
+                    <h3 class="post-title">${escapeHtml(post.title)}</h3>
+                    <div class="post-image-container">
+                        <img src="${post.image}" alt="Imagem do personagem ${escapeHtml(post.character)}">
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn ${post.liked ? 'active' : ''}" onclick="toggleLike(${post.id})">
+                            ❤️ <span>${post.likes}</span>
+                        </button>
+                        <button class="action-btn" onclick="toggleComments(${post.id})">
+                            💬 <span>${post.comments.length} Comentários</span>
+                        </button>
+                    </div>
+                    <div class="comments-section" id="comments-${post.id}">
+                        <div class="comments-list">
+                            ${post.comments.length === 0 ? '<p style="color: var(--text-secondary); font-size: 0.85rem;">Nenhum comentário ainda. Inicie a conversa!</p>' : ''}
+                            ${post.comments.map(c => `
+                                <div class="comment-item">
+                                    <div class="comment-author">${escapeHtml(c.author)}</div>
+                                    <div>${escapeHtml(c.text)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <form class="comment-form" onsubmit="addComment(event, ${post.id})">
+                            <input type="text" id="comment-input-${post.id}" class="form-control" placeholder="Escreva um comentário sobre a imagem..." required>
+                            <button type="submit" class="btn">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função simples para evitar injeção de HTML básica
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        // Carga inicial
+        renderFeed();
+    </script>
+</body>
+</html>
